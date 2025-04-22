@@ -7,18 +7,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import type { Database } from "@/integrations/supabase/types";
+
+type BlogPost = Database['public']['Tables']['blog_posts']['Row'];
 
 export default function EditPost() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [post, setPost] = useState({
+  const [post, setPost] = useState<BlogPost>({
+    id: '',
     title: "",
     content: "",
     excerpt: "",
     published: true,
+    created_at: '',
+    updated_at: '',
   });
 
   useEffect(() => {
@@ -54,7 +60,7 @@ export default function EditPost() {
     fetchPost();
   }, [id, navigate]);
 
-  const handleUpdatePost = async (e) => {
+  const handleUpdatePost = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!post.title || !post.content) {
@@ -136,7 +142,7 @@ export default function EditPost() {
             <Label htmlFor="excerpt">Excerpt (optional)</Label>
             <Textarea
               id="excerpt"
-              value={post.excerpt}
+              value={post.excerpt || ''}
               onChange={(e) => setPost({...post, excerpt: e.target.value})}
               placeholder="Brief summary of your post (optional)"
               rows={3}

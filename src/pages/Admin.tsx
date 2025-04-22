@@ -10,12 +10,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Database } from "@/integrations/supabase/types";
+
+type BlogPost = Database['public']['Tables']['blog_posts']['Row'];
 
 export default function Admin() {
   const navigate = useNavigate();
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [newPost, setNewPost] = useState({
     title: "",
     content: "",
@@ -75,7 +78,7 @@ export default function Admin() {
   };
 
   // Handle creating a new post
-  const handleCreatePost = async (e) => {
+  const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!newPost.title || !newPost.content) {
@@ -118,7 +121,7 @@ export default function Admin() {
   };
 
   // Handle deleting a post
-  const handleDeletePost = async (id) => {
+  const handleDeletePost = async (id: string) => {
     if (!confirm("Are you sure you want to delete this post?")) {
       return;
     }
@@ -151,7 +154,6 @@ export default function Admin() {
     );
   }
 
-  // Render admin dashboard
   return (
     <Layout>
       <div className="container mx-auto py-12">
@@ -170,7 +172,7 @@ export default function Admin() {
               {posts.length > 0 ? (
                 <div className="grid gap-4">
                   {posts.map((post) => (
-                    <Card key={post.id} className="overflow-hidden">
+                    <Card key={post.id}>
                       <CardHeader>
                         <CardTitle>{post.title}</CardTitle>
                         <CardDescription>
