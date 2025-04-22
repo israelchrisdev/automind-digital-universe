@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Settings } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -16,6 +17,7 @@ const navigation = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [session, setSession] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -29,8 +31,22 @@ export default function Navbar() {
     };
 
     window.addEventListener("scroll", handleScroll);
+    
+    // Check for auth session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+    
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_, session) => {
+        setSession(session);
+      }
+    );
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -67,6 +83,21 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Admin link if logged in */}
+            {session && (
+              <Link
+                to="/admin"
+                className={`text-sm font-medium py-2 transition-colors duration-300 flex items-center ${
+                  location.pathname === "/admin"
+                    ? "text-automind-purple border-b-2 border-automind-purple"
+                    : "text-foreground hover:text-automind-purple"
+                }`}
+              >
+                <Settings size={16} className="mr-1" />
+                Admin
+              </Link>
+            )}
           </div>
 
           <div className="hidden md:flex">
@@ -107,6 +138,23 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Admin link in mobile menu if logged in */}
+            {session && (
+              <Link
+                to="/admin"
+                onClick={() => setIsOpen(false)}
+                className={`block py-3 pl-3 pr-4 text-base font-medium rounded-md flex items-center ${
+                  location.pathname === "/admin"
+                    ? "bg-automind-purple/10 text-automind-purple"
+                    : "text-foreground hover:bg-gray-100 dark:hover:bg-automind-dark"
+                }`}
+              >
+                <Settings size={16} className="mr-2" />
+                Admin
+              </Link>
+            )}
+            
             <div className="pt-4">
               <Button
                 asChild
