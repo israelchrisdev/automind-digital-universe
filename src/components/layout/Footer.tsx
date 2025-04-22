@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Instagram, Mail, MapPin, Phone } from "lucide-react";
 
