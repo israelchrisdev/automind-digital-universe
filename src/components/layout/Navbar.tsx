@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Settings } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const navigation = [
@@ -10,7 +9,6 @@ const navigation = [
   { name: "About", href: "/about" },
   { name: "Services", href: "/services" },
   { name: "Portfolio", href: "/portfolio" },
-  { name: "Blog", href: "/blog" },
   { name: "Reviews", href: "/reviews" },
 ];
 
@@ -83,21 +81,6 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
-            
-            {/* Admin link if logged in */}
-            {session && (
-              <Link
-                to="/admin"
-                className={`text-sm font-medium py-2 transition-colors duration-300 flex items-center ${
-                  location.pathname === "/admin"
-                    ? "text-automind-purple border-b-2 border-automind-purple"
-                    : "text-foreground hover:text-automind-purple"
-                }`}
-              >
-                <Settings size={16} className="mr-1" />
-                Admin
-              </Link>
-            )}
           </div>
 
           <div className="hidden md:flex">
@@ -138,22 +121,6 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
-            
-            {/* Admin link in mobile menu if logged in */}
-            {session && (
-              <Link
-                to="/admin"
-                onClick={() => setIsOpen(false)}
-                className={`block py-3 pl-3 pr-4 text-base font-medium rounded-md flex items-center ${
-                  location.pathname === "/admin"
-                    ? "bg-automind-purple/10 text-automind-purple"
-                    : "text-foreground hover:bg-gray-100 dark:hover:bg-automind-dark"
-                }`}
-              >
-                <Settings size={16} className="mr-2" />
-                Admin
-              </Link>
-            )}
             
             <div className="pt-4">
               <Button
