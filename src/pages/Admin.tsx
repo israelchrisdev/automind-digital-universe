@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
@@ -8,44 +8,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Database } from "@/integrations/supabase/types";
 import CreatePostForm from "@/components/admin/CreatePostForm";
 import PostsList from "@/components/admin/PostsList";
+import { useAuth } from "@/hooks/useAuth";
 
 type BlogPost = Database['public']['Tables']['blog_posts']['Row'];
 
 export default function Admin() {
   const navigate = useNavigate();
-  const [session, setSession] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoading } = useAuth("/");
   const [posts, setPosts] = useState<BlogPost[]>([]);
-
-  // Check if user is authenticated
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setSession(data.session);
-      setIsLoading(false);
-      
-      if (!data.session) {
-        navigate("/");
-        toast.error("You must be logged in to access the admin panel");
-      } else {
-        fetchPosts();
-      }
-    };
-    
-    checkSession();
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_, session) => {
-        setSession(session);
-        if (!session) {
-          navigate("/");
-        }
-      }
-    );
-    
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
+  
   const fetchPosts = async () => {
     try {
       const { data, error } = await supabase
